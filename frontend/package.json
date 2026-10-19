@@ -1,0 +1,29 @@
+{
+  "name": "agri-monitor-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "oxlint"
+  },
+  "dependencies": {
+    "@fontsource/poppins": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "axios": "^1.7.7",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^1.26.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.1",
+    "recharts": "^3.10.0",
+    "tailwindcss": "^4.3.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.3",
+    "vite": "^8.1.1"
+  }
+}

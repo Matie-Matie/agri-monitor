@@ -1,0 +1,66 @@
+@import "tailwindcss";
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
+
+/* ── Agri Monitor Design System (green + white, MatieePort style) ── */
+@theme {
+  --color-brand-50: #F6F6F6;
+  --color-brand-100: #ECECEC;
+
+  /* Greens */
+  --color-green-primary: #1C6F45;
+  --color-green-dark: #155C39;
+  --color-green-light: #74D4A3;
+  --color-green-mint: #C8F1D6;
+
+  /* Neutrals */
+  --color-ink-900: #121212;
+  --color-mid-500: #8A8A8A;
+  --color-mid-300: #B0B0B0;
+  --color-mid-100: #F0F0F0;
+  --color-white: #FFFFFF;
+
+  /* Status */
+  --color-status-ok: #1C6F45;
+  --color-status-warn: #E8A838;
+  --color-status-danger: #DC4A4A;
+
+  /* Font */
+  --font-sans: "Poppins", system-ui, sans-serif;
+
+  /* Shadows */
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.12);
+
+  /* Radii */
+  --radius-card: 22px;
+  --radius-container: 32px;
+  --radius-pill: 999px;
+  --radius-input: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Poppins", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F6F6F6;
+  color: #121212;
+}
+
+::selection { background: #C8F1D6; color: #155C39; }
+
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 999px; }
+*::-webkit-scrollbar-thumb:hover { background: #B0B0B0; }
+
+.recharts-default-tooltip {
+  border-radius: 12px !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
