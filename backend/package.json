@@ -1,0 +1,24 @@
+{
+  "name": "agri-monitor-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agri Monitor - Web-Based POS + Inventory System API (Mitch Agri Supply)",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "db:init": "node db/init.js",
+    "db:migrate": "node db/migrate.js",
+    "db:setup": "node db/setup.js",
+    "test": "node test/api.test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.0"
+  }
+}

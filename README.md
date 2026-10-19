@@ -4,6 +4,21 @@ Web-based Point of Sale and Inventory system for **Mitch Agri Supply**.
 Thesis project: "Agri Monitor: A Web-Based Point of Sale and Inventory System of Mitch Agri Supply"
 BSIT Web Development, ISU Roxas — by Roan Bermudez & James Mathew Corpuz.
 
+## Quick start (Windows, localhost) — just double-click `start.bat`
+
+1. Install **XAMPP** (only MySQL is needed, Apache is not) and **Node.js LTS** once.
+2. Double-click **`start.bat`**. It starts MySQL if needed, creates or updates the database by itself, and opens http://localhost:5000.
+3. Keep the black window open while using the system. Press CTRL+C in it to stop.
+
+The download already contains everything (system files + built screens), so **no internet is needed** on the computer. The first run loads demo data; later runs only apply updates and never touch existing data.
+If it says it can't reach the database: open XAMPP Control Panel, press **Start** on MySQL, then double-click `start.bat` again.
+
+> **Never run `npm run db:init` on a database with real data** — it drops every table. `start.bat` uses the safe `db:setup` (create if missing, otherwise migrate).
+
+### Notes for the developer
+- One server runs everything: the backend serves the built frontend from `frontend/dist` (rebuild with `cd frontend && npm run build -- --mode handover`, which keeps the API URL relative). `frontend/dist` and `backend/node_modules` are committed on purpose so an offline PC can run it.
+- The hosted demo (Render + Aiven) was deployed from the separate repo `Matie-Matie/agri-monitor-backend`. Its git history lives in `.render-backend.git` (not part of this repo): `git --git-dir=.render-backend.git --work-tree=backend <command>`. **Run `npm run db:migrate` against the Aiven database before pushing the revised backend there**, or the hosted app will break.
+
 ## Stack
 - **Frontend**: React + Vite + Tailwind CSS v4 + Framer Motion + Recharts + Zustand
 - **Backend**: Node.js + Express + MySQL (mysql2)
