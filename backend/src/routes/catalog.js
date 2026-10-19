@@ -55,6 +55,32 @@ router.get('/suppliers', asyncHandler(async (_req, res) => {
   res.json(rows);
 }));
 
+// Products a supplier delivers. A product delivered by two suppliers shows up under both,
+// each with only the stock that came from that supplier (supplier is recorded per batch).
+router.get('/suppliers/:id', asyncHandler(async (req, res) => {
+  const rows = await q('SELECT * FROM suppliers WHERE id = ?', [req.params.id]);
+  if (!rows[0]) throw new ApiError(404, 'Supplier not found');
+  const id = req.params.id;
+  const products = await q(
+    `SELECT p.id, p.name, p.sku, p.unit, p.is_active, c.name AS category_name,
+            COUNT(b.id) AS batch_count,
+            COALESCE(SUM(b.quantity_in), 0) AS delivered,
+            COALESCE(SUM(CASE WHEN b.expiry_date IS NULL OR b.expiry_date >= CURDATE() THEN b.remaining ELSE 0 END), 0) AS stock_from_supplier,
+            MAX(b.received_at) AS last_received,
+            (SELECT GROUP_CONCAT(DISTINCT s2.name ORDER BY s2.name SEPARATOR ', ')
+               FROM batches b2 JOIN suppliers s2 ON s2.id = b2.supplier_id
+              WHERE b2.product_id = p.id AND b2.supplier_id <> ?) AS also_from
+     FROM products p
+     LEFT JOIN categories c ON c.id = p.category_id
+     LEFT JOIN batches b ON b.product_id = p.id AND b.supplier_id = ?
+     GROUP BY p.id
+     HAVING COUNT(b.id) > 0 OR p.id IN (SELECT id FROM products WHERE supplier_id = ?)
+     ORDER BY p.name`,
+    [id, id, id]
+  );
+  res.json({ ...rows[0], products });
+}));
+
 router.post('/suppliers', roleGuard('admin'), asyncHandler(async (req, res) => {
   const { name, contact } = req.body || {};
   if (!name?.trim()) throw new ApiError(400, 'Supplier name is required');

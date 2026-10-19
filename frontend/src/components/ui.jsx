@@ -41,7 +41,7 @@ export function EmptyState({ title, subtitle }) {
   );
 }
 
-export function Modal({ open, onClose, title, children, hideClose = false }) {
+export function Modal({ open, onClose, title, children, hideClose = false, wide = false }) {
   // Esc always closes, so a modal without the corner X is never a trap.
   useEffect(() => {
     if (!open) return undefined;
@@ -61,7 +61,7 @@ export function Modal({ open, onClose, title, children, hideClose = false }) {
           onClick={onClose}
         >
           <motion.div
-            className="bg-white rounded-container shadow-modal w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            className={`bg-white rounded-container shadow-modal w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-[90vh] overflow-y-auto`}
             initial={{ scale: 0.95, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 20, opacity: 0 }}

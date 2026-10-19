@@ -109,6 +109,17 @@ const s2 = await req('POST', '/suppliers', { token: adminTok, body: { name: 'QA 
 const si3 = await req('POST', `/products/${np.data.id}/batches`, { token: adminTok, body: { quantity: 3, supplier_id: s2.data.id } });
 const npd2 = await req('GET', `/products/${np.data.id}`, { token: adminTok });
 check(npd2.data.batches.some((b) => b.supplier_name === 'QA Supplier B'), 'same product, different supplier per batch');
+// Supplier page: a product delivered by two suppliers shows under BOTH, with only each one's own stock
+const firstSup = sup.data[0];
+await req('POST', `/products/${np.data.id}/batches`, { token: adminTok, body: { quantity: 4, supplier_id: firstSup.id } });
+const detB = await req('GET', `/suppliers/${s2.data.id}`, { token: adminTok });
+const detA = await req('GET', `/suppliers/${firstSup.id}`, { token: adminTok });
+const rowB = detB.data.products?.find((p) => p.id === np.data.id);
+const rowA = detA.data.products?.find((p) => p.id === np.data.id);
+check(detB.status === 200 && !!rowB && !!rowA, 'product appears under both of its suppliers');
+check(Number(rowB?.stock_from_supplier) === 3 && Number(rowA?.stock_from_supplier) === 4, 'each supplier shows only its own stock for the shared product', `${rowA?.stock_from_supplier} / ${rowB?.stock_from_supplier}`);
+check(rowB?.also_from === firstSup.name, 'shared product lists the other supplier', rowB?.also_from);
+check((await req('GET', '/suppliers/999999', { token: adminTok })).status === 404, 'unknown supplier -> 404');
 
 console.log('▶ FIFO + checkout.');
 // Product 9 (Herbicide) has expiring HERB-B1 and later HERB-B2
