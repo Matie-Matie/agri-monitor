@@ -31,11 +31,27 @@ npm install
 npm run dev       # http://localhost:5173 (proxies /api to :5000)
 ```
 
+### Existing database (already has data)
+Never re-run `db:init` on a database with real data: it drops tables. Use the non-destructive migration instead:
+```bash
+cd backend
+npm run db:migrate   # idempotent; adds customers, payment status, per-batch supplier
+```
+Optional env: `LOW_STOCK_THRESHOLD` (default 10): one global low-stock rule for every product.
+
 ## Demo accounts
 | Username | Password | Role |
 | :--- | :--- | :--- |
 | admin | admin123 | Admin — full access |
-| cashier | cashier123 | Staff — POS + inventory view |
+| cashier | cashier123 | Staff — POS (only staff can sell) + view products |
+
+## Panel revisions (2026-10)
+- **Barcode:** every product's SKU is its barcode. *Products > barcode icon* (or tick several rows > Print labels) prints Code128 labels. POS has an always-focused **Scan barcode** field: the USB scanner types the code + Enter and the item is added (scan again to add another).
+- **Auto batch number** `B{YYMMDD}-{productId}-{nn}` on every receiving; *Add product* with a first quantity creates the product and its first batch together.
+- **Products page = inventory:** click a row to see its batches (supplier, date received, expiry). Filters for low / out / expiring / expired / active / inactive; dashboard cards link straight to them.
+- **Customers in POS:** pick or add a customer; **Charge (unpaid)** creates an *Invoice*, *Paid now* creates a *Receipt*. Mark invoices paid from *Sales*.
+- **Suppliers** page (admin); each stock batch records its supplier, so one product can come from several.
+- Admin has no POS (panel decision); reorder level removed (low stock = ≤ `LOW_STOCK_THRESHOLD`).
 
 ## Key features
 - **POS checkout** with transactional FIFO stock deduction (sell soonest-expiry batch first)

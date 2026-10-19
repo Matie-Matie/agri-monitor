@@ -4,17 +4,18 @@ import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import POS from './pages/POS.jsx';
 import Products from './pages/Products.jsx';
-import Inventory from './pages/Inventory.jsx';
+import Suppliers from './pages/Suppliers.jsx';
 import Sales from './pages/Sales.jsx';
 import Reports from './pages/Reports.jsx';
 import Users from './pages/Users.jsx';
 import Activity from './pages/Activity.jsx';
 import Layout from './components/Layout.jsx';
 
-function Protected({ children, adminOnly = false }) {
+function Protected({ children, adminOnly = false, staffOnly = false }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   if (adminOnly && user.role !== 'admin') return <Navigate to="/" replace />;
+  if (staffOnly && user.role === 'admin') return <Navigate to="/" replace />;
   return children;
 }
 
@@ -31,9 +32,10 @@ export default function App() {
         }
       >
         <Route path="/" element={<Dashboard />} />
-        <Route path="/pos" element={<POS />} />
+        <Route path="/pos" element={<Protected staffOnly><POS /></Protected>} />
         <Route path="/products" element={<Products />} />
-        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/inventory" element={<Navigate to="/products" replace />} />
+        <Route path="/suppliers" element={<Protected adminOnly><Suppliers /></Protected>} />
         <Route path="/sales" element={<Sales />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/users" element={<Protected adminOnly><Users /></Protected>} />

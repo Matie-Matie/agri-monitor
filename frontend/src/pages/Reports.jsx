@@ -77,8 +77,8 @@ function TabContent({ tab, data }) {
   if (tab === 'sales') return <SalesReport data={data} />;
   if (tab === 'inventory') return <GenericTable title="Inventory" columns={['Product', 'SKU', 'Category', 'Price', 'Stock']}
     rows={data.map((r) => [r.name, r.sku, r.category_name, peso(r.selling_price), `${r.stock_qty}`])} />;
-  if (tab === 'low-stock') return <GenericTable title="Low stock items" columns={['Product', 'SKU', 'On hand', 'Reorder']}
-    rows={data.map((r) => [r.name, r.sku, r.stock_qty, r.reorder_level])} />;
+  if (tab === 'low-stock') return <GenericTable title="Low stock items" columns={['Product', 'SKU', 'On hand']}
+    rows={data.map((r) => [r.name, r.sku, r.stock_qty])} />;
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">

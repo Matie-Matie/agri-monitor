@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Box } from 'lucide-react';
 
@@ -40,7 +41,15 @@ export function EmptyState({ title, subtitle }) {
   );
 }
 
-export function Modal({ open, onClose, title, children }) {
+export function Modal({ open, onClose, title, children, hideClose = false }) {
+  // Esc always closes, so a modal without the corner X is never a trap.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose]);
+
   return (
     <AnimatePresence>
       {open && (
@@ -60,9 +69,11 @@ export function Modal({ open, onClose, title, children }) {
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-brand-100 sticky top-0 bg-white z-10 rounded-t-container">
               <h3 className="font-semibold text-lg">{title}</h3>
-              <button onClick={onClose} className="p-1.5 rounded-full hover:bg-brand-100 text-mid-500">
-                <X className="w-5 h-5" />
-              </button>
+              {!hideClose && (
+                <button onClick={onClose} className="p-1.5 rounded-full hover:bg-brand-100 text-mid-500">
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
             <div className="p-6">{children}</div>
           </motion.div>

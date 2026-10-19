@@ -64,3 +64,11 @@ body {
   border: none !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
 }
+/* ── Barcode label sheet: hidden on screen, the only thing printed ── */
+.print-labels { display: none; }
+@media print {
+  #root { display: none !important; }
+  .print-labels { display: grid !important; grid-template-columns: repeat(3, 62mm); gap: 3mm; padding: 6mm; }
+  .print-label { break-inside: avoid; }
+  body { background: #fff; }
+}

@@ -1,16 +1,16 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard, ShoppingCart, Package, Boxes, Receipt, BarChart3, Users as UsersIcon,
+  LayoutDashboard, ShoppingCart, Package, Truck, Receipt, BarChart3, Users as UsersIcon,
   ScrollText, LogOut, Store,
 } from 'lucide-react';
 import { useAuth, isAdmin } from '../store/auth.js';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/pos', label: 'Point of Sale', icon: ShoppingCart },
+  { to: '/pos', label: 'Point of Sale', icon: ShoppingCart, staff: true },
   { to: '/products', label: 'Products', icon: Package },
-  { to: '/inventory', label: 'Inventory', icon: Boxes },
+  { to: '/suppliers', label: 'Suppliers', icon: Truck, admin: true },
   { to: '/sales', label: 'Sales', icon: Receipt },
   { to: '/reports', label: 'Reports', icon: BarChart3 },
   { to: '/users', label: 'Users', icon: UsersIcon, admin: true },
@@ -37,7 +37,7 @@ export default function Layout() {
 
         <nav className="flex-1 px-3 space-y-1">
           {navItems
-            .filter((item) => !item.admin || isAdmin())
+            .filter((item) => (!item.admin || isAdmin()) && (!item.staff || !isAdmin()))
             .map((item) => (
               <NavLink
                 key={item.to}
