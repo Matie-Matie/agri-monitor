@@ -5,7 +5,7 @@ import {
   ScrollText, LogOut, Store,
 } from 'lucide-react';
 import { useAuth, isAdmin } from '../store/auth.js';
-import AppFooter from './AppFooter.jsx';
+import { APP_VERSION, APP_UPDATED } from '../version.js';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -33,6 +33,12 @@ export default function Layout() {
           <div>
             <p className="font-semibold leading-tight">Agri Monitor</p>
             <p className="text-xs text-mid-500">Mitch Agri Supply</p>
+            <span
+              className="inline-flex mt-1.5 px-2 py-0.5 rounded-full bg-green-light text-green-dark text-[11px] font-semibold"
+              title={`Updated ${APP_UPDATED}`}
+            >
+              Version {APP_VERSION} · Revision {APP_VERSION - 1}
+            </span>
           </div>
         </div>
 
@@ -77,16 +83,14 @@ export default function Layout() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 ml-64 p-8 flex flex-col min-h-screen">
+      <main className="flex-1 ml-64 p-8">
         <motion.div
-          className="flex-1"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
           <Outlet />
         </motion.div>
-        <AppFooter />
       </main>
     </div>
   );
