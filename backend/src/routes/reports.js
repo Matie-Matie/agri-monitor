@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { q } from '../config/db.js';
 import { authRequired, roleGuard } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/error.js';
+import { asyncHandler, ApiError } from '../middleware/error.js';
+import { rangeDateError } from '../utils/helpers.js';
 import { LOW_STOCK_THRESHOLD } from '../config/settings.js';
 
 const router = Router();
@@ -60,6 +61,8 @@ router.get('/expiry', asyncHandler(async (req, res) => {
 // ── Sales report ──
 router.get('/sales', asyncHandler(async (req, res) => {
   const { from, to, group_by = 'day' } = req.query;
+  const dateErr = rangeDateError({ from, to });
+  if (dateErr) throw new ApiError(400, dateErr);
   const where = ['1=1'];
   const params = [];
   if (from) { where.push('s.created_at >= ?'); params.push(`${from} 00:00:00`); }

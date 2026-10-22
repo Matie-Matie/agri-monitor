@@ -2,14 +2,14 @@ import { Router } from 'express';
 import { pool, q } from '../config/db.js';
 import { authRequired, roleGuard } from '../middleware/auth.js';
 import { asyncHandler, ApiError } from '../middleware/error.js';
-import { logActivity, todayLocal } from '../utils/helpers.js';
+import { logActivity, todayLocal, rangeDateError } from '../utils/helpers.js';
 
 const router = Router();
 router.use(authRequired);
 
 // ── Checkout (transactional, FIFO by expiry) ──
 // POS is staff-only (panel decision: admin has no cart).
-router.post('/sales', roleGuard('staff'), asyncHandler(async (req, res) => {
+router.post('/sales', roleGuard('staff', 'admin'), asyncHandler(async (req, res) => {
   const { items, payment_method = 'cash', customer_id = null, payment_status = 'paid' } = req.body || {};
   if (!['paid', 'unpaid'].includes(payment_status)) throw new ApiError(400, 'Invalid payment status');
   if (payment_status === 'unpaid' && !customer_id) throw new ApiError(400, 'Select a customer for an unpaid (charge) sale');
@@ -114,6 +114,8 @@ const todayStr = () => {
 // ── Sales list ──
 router.get('/sales', asyncHandler(async (req, res) => {
   const { from, to, status, page = 1, per_page = 20 } = req.query;
+  const dateErr = rangeDateError({ from, to });
+  if (dateErr) throw new ApiError(400, dateErr);
   const where = ['1=1'];
   const params = [];
   if (from) { where.push('s.created_at >= ?'); params.push(`${from} 00:00:00`); }

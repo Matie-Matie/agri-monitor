@@ -12,7 +12,26 @@ const UNITS = [
   ['box', 'Box'], ['bag', 'Bag'], ['bottle', 'Bottle'], ['liter', 'Liter'],
 ];
 
-const today = () => new Date().toISOString().slice(0, 10);
+// Local calendar day (toISOString is UTC, which is "yesterday" before 8 AM in PH).
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+// Real calendar day check — rejects Feb 31 / Apr 31 even when a browser lets it be typed.
+const isRealDate = (v) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v || '')) return false;
+  const [y, m, d] = v.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
+};
+const batchDateError = ({ received_at, expiry_date }) => {
+  if (received_at && !isRealDate(received_at)) return 'Date received is not a real date';
+  if (expiry_date && !isRealDate(expiry_date)) return 'Expiry date is not a real date';
+  if (received_at && received_at > today()) return 'Date received cannot be in the future';
+  if (received_at && expiry_date && expiry_date < received_at) return 'Expiry date cannot be before the date received';
+  return null;
+};
 const emptyForm = () => ({
   name: '', sku: '', category_id: '', supplier_id: '', unit: 'sack', cost_price: '', selling_price: '',
   initial_quantity: '', received_at: today(), expiry_date: '', is_active: 1,
@@ -86,6 +105,8 @@ export default function Products() {
 
   const save = async (e) => {
     e.preventDefault();
+    const dateErr = !editing && Number(form.initial_quantity) > 0 && batchDateError(form);
+    if (dateErr) { toast.error(dateErr); return; }
     try {
       if (editing) {
         await api.put(`/products/${editing.id}`, form);
@@ -124,6 +145,8 @@ export default function Products() {
   };
   const submitStock = async (e) => {
     e.preventDefault();
+    const dateErr = batchDateError(stockForm);
+    if (dateErr) { toast.error(dateErr); return; }
     try {
       const { data } = await api.post(`/products/${stockModal.id}/batches`, stockForm);
       toast.success(data.message);
@@ -295,8 +318,8 @@ export default function Products() {
               <p className="text-sm font-medium">First stock <span className="text-mid-500 font-normal">· batch number is generated automatically</span></p>
               <div className="grid grid-cols-2 gap-3">
                 <Input label="Quantity" type="number" min="0" value={form.initial_quantity} onChange={(e) => setForm({ ...form, initial_quantity: e.target.value })} placeholder="0" />
-                <Input label="Date received" type="date" value={form.received_at} onChange={(e) => setForm({ ...form, received_at: e.target.value })} />
-                <div className="col-span-2"><Input label="Expiry date (optional)" type="date" value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} /></div>
+                <Input label="Date received" type="date" max={today()} value={form.received_at} onChange={(e) => setForm({ ...form, received_at: e.target.value })} />
+                <div className="col-span-2"><Input label="Expiry date (optional)" type="date" min={form.received_at || undefined} value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} /></div>
               </div>
             </div>
           )}
@@ -320,7 +343,7 @@ export default function Products() {
             <p className="text-sm text-mid-500">A batch number is generated automatically when you save.</p>
             <div className="grid grid-cols-2 gap-3">
               <Input label={`Quantity (${stockModal.unit})`} type="number" min="1" value={stockForm.quantity} onChange={(e) => setStockForm({ ...stockForm, quantity: e.target.value })} required />
-              <Input label="Date received" type="date" value={stockForm.received_at} onChange={(e) => setStockForm({ ...stockForm, received_at: e.target.value })} />
+              <Input label="Date received" type="date" max={today()} value={stockForm.received_at} onChange={(e) => setStockForm({ ...stockForm, received_at: e.target.value })} />
             </div>
             <label className="block">
               <span className="block text-sm font-medium mb-1.5">Supplier</span>
@@ -330,7 +353,7 @@ export default function Products() {
                 {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </label>
-            <Input label="Expiry date (optional)" type="date" value={stockForm.expiry_date} onChange={(e) => setStockForm({ ...stockForm, expiry_date: e.target.value })} />
+            <Input label="Expiry date (optional)" type="date" min={stockForm.received_at || undefined} value={stockForm.expiry_date} onChange={(e) => setStockForm({ ...stockForm, expiry_date: e.target.value })} />
             <div className="flex gap-3 pt-2">
               <Button type="submit" className="flex-1">Add stock</Button>
               <Button type="button" variant="outline" onClick={() => setStockModal(null)}>Cancel</Button>

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { pool, q } from '../config/db.js';
 import { authRequired, roleGuard } from '../middleware/auth.js';
 import { asyncHandler, ApiError } from '../middleware/error.js';
-import { logActivity, nextBatchNo } from '../utils/helpers.js';
+import { logActivity, nextBatchNo, batchDateError } from '../utils/helpers.js';
 import { LOW_STOCK_THRESHOLD } from '../config/settings.js';
 
 const router = Router();
@@ -89,6 +89,8 @@ router.post('/products', roleGuard('admin'), asyncHandler(async (req, res) => {
   if (!name?.trim() || !sku?.trim() || !category_id) throw new ApiError(400, 'Name, sku, and category are required');
   const qty = Number(initial_quantity) || 0;
   if (qty < 0) throw new ApiError(400, 'Initial quantity cannot be negative');
+  const dateErr = batchDateError({ received_at, expiry_date });
+  if (dateErr) throw new ApiError(400, dateErr);
 
   const conn = await pool.getConnection();
   try {

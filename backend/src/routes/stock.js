@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { pool, q } from '../config/db.js';
 import { authRequired, roleGuard } from '../middleware/auth.js';
 import { asyncHandler, ApiError } from '../middleware/error.js';
-import { logActivity, nextBatchNo } from '../utils/helpers.js';
+import { logActivity, nextBatchNo, batchDateError } from '../utils/helpers.js';
 import { LOW_STOCK_THRESHOLD } from '../config/settings.js';
 
 const router = Router();
@@ -48,6 +48,8 @@ router.post('/products/:id/batches', roleGuard('admin'), asyncHandler(async (req
   if (!product[0]) throw new ApiError(404, 'Product not found');
   const qty = Number(quantity);
   if (!qty || qty <= 0) throw new ApiError(400, 'A positive quantity is required');
+  const dateErr = batchDateError({ received_at, expiry_date });
+  if (dateErr) throw new ApiError(400, dateErr);
 
   const conn = await pool.getConnection();
   try {

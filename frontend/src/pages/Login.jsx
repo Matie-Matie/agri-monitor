@@ -5,6 +5,7 @@ import { Store, Sprout } from 'lucide-react';
 import { useAuth } from '../store/auth.js';
 import { Button, Input } from '../components/ui.jsx';
 import { Toaster, toast } from '../components/Toast.jsx';
+import AppFooter from '../components/AppFooter.jsx';
 
 export default function Login() {
   const { login } = useAuth();
@@ -96,8 +97,9 @@ export default function Login() {
           <div className="mt-8 text-xs text-mid-500 bg-brand-100 rounded-2xl p-4">
             <p className="font-medium text-ink-900 mb-1">Demo accounts</p>
             <p>admin / admin123 (full access)</p>
-            <p>cashier / cashier123 (POS + inventory)</p>
+            <p>cashier / cashier123 (POS + view products)</p>
           </div>
+          <AppFooter className="mt-6" />
         </motion.form>
       </div>
       <Toaster />

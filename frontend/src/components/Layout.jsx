@@ -5,10 +5,11 @@ import {
   ScrollText, LogOut, Store,
 } from 'lucide-react';
 import { useAuth, isAdmin } from '../store/auth.js';
+import AppFooter from './AppFooter.jsx';
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/pos', label: 'Point of Sale', icon: ShoppingCart, staff: true },
+  { to: '/pos', label: 'Point of Sale', icon: ShoppingCart },
   { to: '/products', label: 'Products', icon: Package },
   { to: '/suppliers', label: 'Suppliers', icon: Truck, admin: true },
   { to: '/sales', label: 'Sales', icon: Receipt },
@@ -37,7 +38,7 @@ export default function Layout() {
 
         <nav className="flex-1 px-3 space-y-1">
           {navItems
-            .filter((item) => (!item.admin || isAdmin()) && (!item.staff || !isAdmin()))
+            .filter((item) => !item.admin || isAdmin())
             .map((item) => (
               <NavLink
                 key={item.to}
@@ -76,14 +77,16 @@ export default function Layout() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 ml-64 p-8 flex flex-col min-h-screen">
         <motion.div
+          className="flex-1"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
           <Outlet />
         </motion.div>
+        <AppFooter />
       </main>
     </div>
   );

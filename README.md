@@ -58,7 +58,13 @@ Optional env: `LOW_STOCK_THRESHOLD` (default 10): one global low-stock rule for 
 | Username | Password | Role |
 | :--- | :--- | :--- |
 | admin | admin123 | Admin — full access |
-| cashier | cashier123 | Staff — POS (only staff can sell) + view products |
+| cashier | cashier123 | Staff — POS + view products |
+
+## Version 3 (2026-10-22)
+
+- **Footer with version** on every page and the login screen: *Version 3 · Revision 2 · Updated October 22, 2026*. Bump `frontend/src/version.js` on each revision.
+- **Date validation** — impossible dates (e.g. Feb 31) are rejected for date received / expiry, both in the form and by the server. Date received cannot be in the future, and expiry cannot be before the date received. Report and sales date filters are validated too.
+- **Admin has Point of Sale again** (admin and staff can both sell).
 
 ## Panel revisions (2026-10)
 - **Barcode:** every product's SKU is its barcode. *Products > barcode icon* (or tick several rows > Print labels) prints Code128 labels. POS has an always-focused **Scan barcode** field: the USB scanner types the code + Enter and the item is added (scan again to add another).
@@ -66,7 +72,7 @@ Optional env: `LOW_STOCK_THRESHOLD` (default 10): one global low-stock rule for 
 - **Products page = inventory:** click a row to see its batches (supplier, date received, expiry). Filters for low / out / expiring / expired / active / inactive; dashboard cards link straight to them.
 - **Customers in POS:** pick or add a customer; **Charge (unpaid)** creates an *Invoice*, *Paid now* creates a *Receipt*. Mark invoices paid from *Sales*.
 - **Suppliers** page (admin); each stock batch records its supplier, so one product can come from several.
-- Admin has no POS (panel decision); reorder level removed (low stock = ≤ `LOW_STOCK_THRESHOLD`).
+- Admin can use the POS again (Version 3); reorder level removed (low stock = ≤ `LOW_STOCK_THRESHOLD`).
 
 ## Key features
 - **POS checkout** with transactional FIFO stock deduction (sell soonest-expiry batch first)

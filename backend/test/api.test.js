@@ -84,9 +84,22 @@ check('inactive_count' in dash0.data && 'out_count' in dash0.data, 'dashboard ha
 for (const f of ['out', 'expiring', 'expired', 'inactive', 'active']) {
   check((await req('GET', `/products?filter=${f}`, { token: adminTok })).status === 200, `products?filter=${f}`);
 }
-// POS is staff only
+// Version 3: admin can use the POS too
 const adminSale = await req('POST', '/sales', { token: adminTok, body: { items: [{ product_id: np.data.id, quantity: 1 }] } });
-check(adminSale.status === 403, 'admin cannot check out (POS staff-only)', `got ${adminSale.status}`);
+check(adminSale.status === 201, 'admin can check out (POS for admin + staff)', `got ${adminSale.status} ${adminSale.data.message || ''}`);
+// Version 3: impossible / inconsistent dates are rejected
+const pid = np.data.id;
+const badDate = async (body) => (await req('POST', `/products/${pid}/batches`, { token: adminTok, body: { quantity: 1, ...body } })).status;
+check(await badDate({ expiry_date: '2027-02-31' }) === 400, 'Feb 31 expiry rejected');
+check(await badDate({ expiry_date: '2027-04-31' }) === 400, 'Apr 31 expiry rejected');
+check(await badDate({ received_at: '2026-02-30' }) === 400, 'Feb 30 date received rejected');
+check(await badDate({ received_at: '2099-01-01' }) === 400, 'future date received rejected');
+check(await badDate({ received_at: '2026-01-10', expiry_date: '2026-01-05' }) === 400, 'expiry before received rejected');
+check(await badDate({ expiry_date: '2028-02-29' }) === 201, 'leap day Feb 29 2028 accepted');
+const badNew = await req('POST', '/products', { token: adminTok, body: { name: 'QA Bad Date', sku: 'QA-BAD-DATE', category_id: cats.data[0].id, initial_quantity: 3, expiry_date: '2027-02-31' } });
+check(badNew.status === 400 && !(await req('GET', '/products/by-sku/QA-BAD-DATE', { token: adminTok })).data?.id, 'new product with Feb 31 expiry rejected (nothing saved)');
+check((await req('GET', '/sales?from=2026-02-31', { token: adminTok })).status === 400, 'sales filter rejects Feb 31');
+check((await req('GET', '/reports/sales?from=2026-02-31', { token: adminTok })).status === 400, 'report filter rejects Feb 31');
 // Customers + unpaid -> invoice, paid -> receipt
 const cust = await req('POST', '/customers', { token: staffTok, body: { name: 'QA Farmer', phone: '0917' } });
 check(cust.status === 201, 'add customer (staff)');
