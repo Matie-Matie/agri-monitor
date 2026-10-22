@@ -36,20 +36,21 @@ export default function Login() {
       <div className="hidden lg:flex flex-1 relative overflow-hidden bg-green-primary">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 40%, #fff 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
-              <Store className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="font-semibold text-lg leading-tight">Mitch Agri Supply</p>
-              <p className="text-white/70 text-sm">POS & Inventory System</p>
-            </div>
-          </div>
+          <div aria-hidden="true" />
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <h1 className="text-4xl font-semibold leading-tight max-w-md">
-              Manage your agri supply store with ease.
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
+                <Store className="w-6 h-6" />
+              </div>
+              <p className="text-white/85 text-base font-medium">POS & Inventory System</p>
+            </div>
+            <h1 className="text-5xl font-bold leading-tight tracking-tight max-w-md">
+              Mitch Agri Supply
             </h1>
-            <p className="mt-4 text-white/75 max-w-md">
+            <p className="mt-3 text-lg font-semibold text-white/90 max-w-md">
+              Manage your agri supply store with ease.
+            </p>
+            <p className="mt-2 text-white/75 max-w-md">
               Track stock, watch expiry dates, ring up sales — all in one clean dashboard for Mitch Agri Supply.
             </p>
           </motion.div>

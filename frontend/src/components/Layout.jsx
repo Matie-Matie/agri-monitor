@@ -26,20 +26,22 @@ export default function Layout() {
     <div className="flex min-h-screen bg-brand-50">
       {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 w-64 bg-white border-r border-brand-100 flex flex-col z-20">
-        <div className="flex items-center gap-3 px-6 py-6">
-          <div className="w-10 h-10 rounded-2xl bg-green-primary flex items-center justify-center shadow-lg shadow-green-primary/20">
-            <Store className="w-5 h-5 text-white" />
+        <div className="px-6 pt-6 pb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-green-primary flex items-center justify-center shadow-lg shadow-green-primary/20">
+              <Store className="w-5 h-5 text-white" />
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-mid-500">Agri Monitor</p>
           </div>
-          <div>
-            <p className="font-semibold leading-tight">Agri Monitor</p>
-            <p className="text-[15px] font-semibold leading-tight text-green-dark">Mitch Agri Supply</p>
-            <span
-              className="inline-flex mt-1.5 px-2 py-0.5 rounded-full bg-green-light text-green-dark text-[11px] font-semibold"
-              title={`Updated ${APP_UPDATED}`}
-            >
-              Version {APP_VERSION} · Revision {APP_VERSION - 1}
-            </span>
-          </div>
+          <p className="mt-3 text-[1.7rem] font-extrabold leading-[1.05] tracking-tight text-green-dark">
+            Mitch Agri Supply
+          </p>
+          <span
+            className="inline-flex mt-2.5 px-2.5 py-0.5 rounded-full bg-green-light text-green-dark text-xs font-semibold"
+            title={`Updated ${APP_UPDATED}`}
+          >
+            Version {APP_VERSION} · Revision {APP_VERSION - 1}
+          </span>
         </div>
 
         <nav className="flex-1 px-3 space-y-1">
