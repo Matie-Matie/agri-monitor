@@ -41,7 +41,7 @@ export default function Login() {
               <Store className="w-6 h-6" />
             </div>
             <div>
-              <p className="font-semibold text-lg leading-tight">Agri Monitor</p>
+              <p className="font-semibold text-lg leading-tight">Mitch Agri Supply</p>
               <p className="text-white/70 text-sm">POS & Inventory System</p>
             </div>
           </div>
@@ -72,7 +72,7 @@ export default function Login() {
               <Store className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="font-semibold text-lg leading-tight">Agri Monitor</p>
+              <p className="font-semibold text-lg leading-tight">Mitch Agri Supply</p>
               <p className="text-mid-500 text-sm">POS & Inventory System</p>
             </div>
           </div>
