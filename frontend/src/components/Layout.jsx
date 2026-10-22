@@ -32,7 +32,7 @@ export default function Layout() {
           </div>
           <div>
             <p className="font-semibold leading-tight">Agri Monitor</p>
-            <p className="text-xs text-mid-500">Mitch Agri Supply</p>
+            <p className="text-[15px] font-semibold leading-tight text-green-dark">Mitch Agri Supply</p>
             <span
               className="inline-flex mt-1.5 px-2 py-0.5 rounded-full bg-green-light text-green-dark text-[11px] font-semibold"
               title={`Updated ${APP_UPDATED}`}
