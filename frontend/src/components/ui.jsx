@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Box } from 'lucide-react';
 
@@ -101,14 +101,32 @@ export function Button({ children, variant = 'primary', className = '', disabled
   );
 }
 
-export function Input({ label, className = '', ...props }) {
+// Date boxes: the browser lets you TYPE an impossible date (e.g. 02/31/2026) but then
+// silently hands us an empty value, so it looked "accepted". Catch it (validity.badInput),
+// show it in red, and mark the field invalid so the form refuses to submit.
+const BAD_DATE = 'That date does not exist (e.g. Feb 31). Pick a real date.';
+
+export function Input({ label, className = '', type, onChange, onBlur, onKeyUp, ...props }) {
+  const [dateErr, setDateErr] = useState('');
+  const checkDate = (el) => {
+    if (type !== 'date') return;
+    const msg = el.validity.badInput ? BAD_DATE : '';
+    el.setCustomValidity(msg);
+    setDateErr(msg);
+  };
   return (
     <label className="block">
       {label && <span className="block text-sm font-medium mb-1.5 text-ink-900">{label}</span>}
       <input
-        className={`w-full px-4 py-2.5 rounded-full border border-brand-100 bg-white focus:outline-none focus:ring-2 focus:ring-green-primary/30 focus:border-green-primary transition-all ${className}`}
+        type={type}
+        aria-invalid={dateErr ? true : undefined}
+        className={`w-full px-4 py-2.5 rounded-full border ${dateErr ? 'border-red-500' : 'border-brand-100'} bg-white focus:outline-none focus:ring-2 focus:ring-green-primary/30 focus:border-green-primary transition-all ${className}`}
+        onChange={(e) => { checkDate(e.target); onChange?.(e); }}
+        onBlur={(e) => { checkDate(e.target); onBlur?.(e); }}
+        onKeyUp={(e) => { checkDate(e.target); onKeyUp?.(e); }}
         {...props}
       />
+      {dateErr && <span role="alert" className="block text-xs text-red-600 mt-1 px-2">{dateErr}</span>}
     </label>
   );
 }
