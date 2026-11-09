@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, CalendarDays, BadgeCheck } from 'lucide-react';
+import { Eye, CalendarDays, BadgeCheck, Printer } from 'lucide-react';
 import api from '../api/client.js';
 import { Card, Button, DateField, Modal, Spinner, Badge, peso, fmtDateTime } from '../components/ui.jsx';
+import ReceiptPrint from '../components/ReceiptPrint.jsx';
 import { toast } from '../components/Toast.jsx';
 
 const localDate = (d = new Date()) =>
@@ -111,7 +112,7 @@ export default function Sales() {
         </Card>
       )}
 
-      {/* Receipt (paid) / Invoice (unpaid). No Print, no corner X: Done / Esc / backdrop close it. */}
+      {/* Receipt (paid) / Invoice (unpaid). Print outputs only the receipt sheet. */}
       <Modal hideClose open={!!invoice} onClose={() => setInvoice(null)}
         title={invoice ? `${isPaid ? 'Receipt' : 'Invoice'} ${invoice.invoice_no}` : ''}>
         {invoice && (
@@ -153,15 +154,19 @@ export default function Sales() {
               <span className="text-2xl font-semibold text-green-primary">{peso(invoice.total_amount)}</span>
             </div>
             {isPaid && invoice.paid_at && <p className="text-xs text-mid-500 mt-1 text-right">Paid {fmtDateTime(invoice.paid_at)}</p>}
-            <div className="flex gap-3 mt-5">
+            <div className="flex flex-wrap gap-3 mt-5">
               {!isPaid && (
                 <Button className="flex-1" onClick={() => markPaid(invoice.id)}><BadgeCheck className="w-4 h-4" /> Mark as paid</Button>
               )}
-              <Button variant="outline" className={isPaid ? 'w-full' : ''} onClick={() => setInvoice(null)}>Done</Button>
+              <Button variant={isPaid ? 'primary' : 'outline'} className={isPaid ? 'flex-1' : ''} onClick={() => window.print()}>
+                <Printer className="w-4 h-4" /> Print {isPaid ? 'receipt' : 'invoice'}
+              </Button>
+              <Button variant="outline" onClick={() => setInvoice(null)}>Done</Button>
             </div>
           </div>
         )}
       </Modal>
+      <ReceiptPrint sale={invoice} />
     </div>
   );
 }

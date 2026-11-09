@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus, ShoppingCart, Trash2, ScanLine, CheckCircle2, UserRound, UserPlus, FileText, Search } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, Trash2, ScanLine, CheckCircle2, UserRound, UserPlus, FileText, Search, Printer } from 'lucide-react';
 import api from '../api/client.js';
 import { Card, Button, Input, Modal, peso, numberFormat, Spinner } from '../components/ui.jsx';
+import ReceiptPrint from '../components/ReceiptPrint.jsx';
+import { useAuth } from '../store/auth.js';
 import { toast } from '../components/Toast.jsx';
 
 export default function POS() {
+  const user = useAuth((s) => s.user);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [cart, setCart] = useState([]); // {product_id, name, price, unit, qty}
@@ -139,7 +142,23 @@ export default function POS() {
         customer_id: customer?.id || null,
         payment_status: payStatus,
       });
-      setReceipt({ ...data, customer_name: customer?.name || null });
+      // POST /sales returns per-batch rows without names/units; use the cart for the
+      // printed receipt so each product is one clean line.
+      const sold = cart.map((i) => ({
+        product_id: i.product_id,
+        product_name: i.name,
+        quantity: Number(i.qty),
+        unit: i.unit,
+        unit_price: i.price,
+        subtotal: i.price * Number(i.qty),
+      }));
+      setReceipt({
+        ...data,
+        customer_name: customer?.name || null,
+        cashier: user?.name,
+        created_at: new Date().toISOString(),
+        items: sold,
+      });
       setCart([]);
       setCustomer(null);
       setPayStatus('paid');
@@ -341,11 +360,17 @@ export default function POS() {
               <p className="text-sm text-mid-500 mt-1">
                 {receipt.items?.length} item{receipt.items?.length !== 1 && 's'} · {receipt.payment_status === 'paid' ? 'Paid' : 'Balance due'}
               </p>
-              <Button className="w-full mt-6" onClick={() => setReceipt(null)}>New sale</Button>
+              <div className="flex gap-3 mt-6">
+                <Button variant="outline" className="flex-1" onClick={() => window.print()}>
+                  <Printer className="w-4 h-4" /> Print {receipt.payment_status === 'paid' ? 'receipt' : 'invoice'}
+                </Button>
+                <Button className="flex-1" onClick={() => setReceipt(null)}>New sale</Button>
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+      <ReceiptPrint sale={receipt} />
 
       {/* Customer picker + add */}
       <Modal open={custModal} onClose={() => setCustModal(false)} title="Customer">
