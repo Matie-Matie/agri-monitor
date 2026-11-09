@@ -7,11 +7,11 @@ BSIT Web Development, ISU Roxas — by Roan Bermudez & James Mathew Corpuz.
 ## Quick start (Windows, localhost) — just double-click `start.bat`
 
 1. Install **XAMPP** (only MySQL is needed, Apache is not) and **Node.js LTS** once.
-2. Double-click **`start.bat`**. It starts MySQL if needed, creates or updates the database by itself, and opens http://localhost:5000.
-3. Keep the black window open while using the system. Press CTRL+C in it to stop.
+2. Double-click **`start.bat`**. It starts **XAMPP MySQL by itself** (looks on C:, D: and E:), creates or updates the database, then opens the system **fullscreen** (Chrome or Edge app window) as soon as the server is ready.
+3. Keep the black window open while using the system. Press CTRL+C in it to stop. Clicking `start.bat` again while it is already running just reopens the fullscreen window.
 
 The download already contains everything (system files + built screens), so **no internet is needed** on the computer. The first run loads demo data; later runs only apply updates and never touch existing data.
-If it says it can't reach the database: open XAMPP Control Panel, press **Start** on MySQL, then double-click `start.bat` again.
+If it says it can't reach the database: close the window, open XAMPP Control Panel, press **Start** on MySQL, then double-click `start.bat` again. Press **F11** to leave fullscreen; **Alt+F4** closes the system window.
 
 > **Never run `npm run db:init` on a database with real data** — it drops every table. `start.bat` uses the safe `db:setup` (create if missing, otherwise migrate).
 
@@ -59,6 +59,11 @@ Optional env: `LOW_STOCK_THRESHOLD` (default 10): one global low-stock rule for 
 | :--- | :--- | :--- |
 | admin | admin123 | Admin — full access |
 | cashier | cashier123 | Staff — POS + view products |
+
+## Version 6 (2026-11-09)
+
+- **One-click fullscreen start.** `start.bat` now finds XAMPP (C:\xampp, D:\xampp or E:\xampp), starts MySQL automatically and waits for it, then opens the system fullscreen in a Chrome/Edge app window once the server is listening. If the server is already running, the same shortcut just reopens the window.
+- If Chrome and Edge are both missing it opens the normal default browser instead (not fullscreen). If MySQL still can't start, the script opens the XAMPP Control Panel and lets you press Start, then retry without closing the window.
 
 ## Version 5 (2026-11-09)
 

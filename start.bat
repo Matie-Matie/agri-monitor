@@ -3,16 +3,42 @@ rem ============================================================
 rem  Agri Monitor - Web-Based POS and Inventory System
 rem  Mitch Agri Supply, Roxas, Isabela
 rem  Double-click to start the system. No tech skills needed.
-rem  1. Starts the database (XAMPP MySQL) if it is not running
+rem  1. Starts XAMPP MySQL automatically (Apache is not needed)
 rem  2. Prepares / updates the database automatically
-rem  3. Opens the system in your browser
-rem  Keep this window open while using the system.
+rem  3. Opens the system fullscreen when the server is ready
+rem  Keep this black window OPEN while using the system.
 rem  To stop: press CTRL+C in this window, then close it.
 rem ============================================================
 title Agri Monitor - Mitch Agri Supply
 cd /d "%~dp0"
 set PORT=5000
+
+rem ---- Locate XAMPP (MySQL only; Apache is not used) ----
+set "XAMPP_DIR="
+if exist "C:\xampp\mysql\bin\mysqld.exe" set "XAMPP_DIR=C:\xampp"
+if not defined XAMPP_DIR if exist "D:\xampp\mysql\bin\mysqld.exe" set "XAMPP_DIR=D:\xampp"
+if not defined XAMPP_DIR if exist "E:\xampp\mysql\bin\mysqld.exe" set "XAMPP_DIR=E:\xampp"
+if not defined XAMPP_DIR if exist "%SystemDrive%\xampp\mysql\bin\mysqld.exe" set "XAMPP_DIR=%SystemDrive%\xampp"
+
+rem ---- Locate Chrome or Edge for the fullscreen window ----
+set "BROWSER_EXE="
+if exist "%ProgramFiles%\Google\Chrome\Application\chrome.exe" set "BROWSER_EXE=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
+if not defined BROWSER_EXE if exist "%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe" set "BROWSER_EXE=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
+if not defined BROWSER_EXE if exist "%LocalAppData%\Google\Chrome\Application\chrome.exe" set "BROWSER_EXE=%LocalAppData%\Google\Chrome\Application\chrome.exe"
+if not defined BROWSER_EXE if exist "%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe" set "BROWSER_EXE=%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"
+if not defined BROWSER_EXE if exist "%ProgramFiles%\Microsoft\Edge\Application\msedge.exe" set "BROWSER_EXE=%ProgramFiles%\Microsoft\Edge\Application\msedge.exe"
+
+rem ---- Already running? Just open it fullscreen ----
+netstat -an | findstr ":%PORT%" | findstr "LISTENING" >nul 2>&1
+if not errorlevel 1 goto already_running
 goto check_node
+
+:already_running
+echo.
+echo  Agri Monitor is already running. Opening it fullscreen...
+echo.
+call :open_browser
+exit /b 0
 
 :check_node
 where node >nul 2>nul
@@ -78,6 +104,7 @@ if exist "backend\.env" goto check_mysql
 if not exist "backend\.env.example" goto no_env
 echo.
 echo  First run - creating your settings file...
+echo.
 copy /y "backend\.env.example" "backend\.env" >nul
 if errorlevel 1 goto no_env
 goto check_mysql
@@ -91,20 +118,44 @@ pause
 exit /b 1
 
 :check_mysql
-netstat -an | findstr ":3306.*LISTENING" >nul 2>&1
+netstat -an | findstr ":3306" | findstr "LISTENING" >nul 2>&1
 if not errorlevel 1 goto prepare_db
-if not exist "C:\xampp\mysql\bin\mysqld.exe" goto mysql_manual
+if not defined XAMPP_DIR goto mysql_missing
 echo.
-echo  Starting the database...
-start "" /min "C:\xampp\mysql\bin\mysqld.exe" --defaults-file="C:\xampp\mysql\bin\my.ini" --standalone --console
-timeout /t 5 /nobreak >nul
+echo  Starting XAMPP MySQL automatically...
+start "" /min "%XAMPP_DIR%\mysql\bin\mysqld.exe" --defaults-file="%XAMPP_DIR%\mysql\bin\my.ini" --standalone --console
+call :wait_mysql
+if errorlevel 1 goto mysql_manual
+echo  Database is running.
 goto prepare_db
 
 :mysql_manual
 echo.
-echo  The database (MySQL) is not running.
-echo  Open XAMPP Control Panel and press Start on MySQL
-echo  (Apache is NOT needed), then double-click this file again.
+echo  XAMPP MySQL did not start automatically.
+if exist "%XAMPP_DIR%\xampp-control.exe" start "" "%XAMPP_DIR%\xampp-control.exe"
+echo  The XAMPP Control Panel was opened. Press Start on MySQL
+echo  (Apache is NOT needed), then press any key here to try again.
+echo.
+if defined MYSQL_RETRIED goto mysql_still_down
+set "MYSQL_RETRIED=1"
+pause >nul
+goto check_mysql
+
+:mysql_still_down
+echo.
+echo  [ERROR] MySQL is still not running.
+echo  Close this window, open the XAMPP Control Panel, press Start
+echo  on MySQL, then double-click start.bat again.
+echo  If it still fails, take a photo of this window and send it to Mat.
+echo.
+pause
+exit /b 1
+
+:mysql_missing
+echo.
+echo  [ERROR] The database (MySQL) is not running and XAMPP was not found.
+echo  Install XAMPP (only MySQL is needed) on C: or D:, then
+echo  double-click this file again.
 echo.
 pause
 exit /b 1
@@ -124,9 +175,9 @@ goto db_fail
 :db_down
 echo.
 echo  [ERROR] Could not reach the database.
-echo  1. Open XAMPP Control Panel
-echo  2. Press Start on MySQL (Apache is not needed)
-echo  3. Double-click this file again
+echo  1. Double-click start.bat again - it starts XAMPP MySQL for you.
+echo  2. If it still fails, open XAMPP Control Panel, press Start on
+echo     MySQL (Apache is not needed), then run start.bat again.
 echo  If it still fails, take a photo of this window and send it to Mat.
 echo.
 pause
@@ -144,20 +195,43 @@ exit /b 1
 echo.
 echo  ============================================================
 echo   Agri Monitor is starting...
-echo   Opening http://localhost:%PORT% in your browser.
+echo   A fullscreen window will open when the server is ready.
 echo   Logins: admin / admin123   and   cashier / cashier123
 echo   (change these passwords on day one)
 echo   Keep this window OPEN while using the system.
 echo   To stop: press CTRL+C here, then close the window.
 echo  ============================================================
 echo.
-timeout /t 3 /nobreak >nul
-start "" "http://localhost:%PORT%"
+timeout /t 2 /nobreak >nul
 pushd backend
 set PORT=%PORT%
+set OPEN_BROWSER=1
 call node server.js
 popd
 echo.
 echo  The system has stopped. You may close this window.
 pause
 exit /b 0
+
+rem ---- Subroutines -------------------------------------------------
+
+rem Opens the system: app-style window, fullscreen, when Chrome/Edge exists.
+:open_browser
+if not defined BROWSER_EXE goto open_browser_default
+start "" "%BROWSER_EXE%" --app=http://localhost:%PORT% --start-fullscreen
+exit /b 0
+
+:open_browser_default
+start "" "http://localhost:%PORT%"
+exit /b 0
+
+rem Waits up to 30 seconds for MySQL to accept connections on port 3306.
+:wait_mysql
+set /a MYSQL_WAIT=0
+:wait_mysql_loop
+netstat -an | findstr ":3306" | findstr "LISTENING" >nul 2>&1
+if not errorlevel 1 exit /b 0
+set /a MYSQL_WAIT+=1
+if %MYSQL_WAIT% GEQ 30 exit /b 1
+timeout /t 1 /nobreak >nul
+goto wait_mysql_loop
