@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Box } from 'lucide-react';
+import { X, Box, CalendarDays } from 'lucide-react';
 
 export function Card({ children, className = '' }) {
   return <div className={`bg-white rounded-card shadow-card ${className}`}>{children}</div>;
@@ -101,33 +101,73 @@ export function Button({ children, variant = 'primary', className = '', disabled
   );
 }
 
-// Date boxes: the browser lets you TYPE an impossible date (e.g. 02/31/2026) but then
-// silently hands us an empty value, so it looked "accepted". Catch it (validity.badInput),
-// show it in red, and mark the field invalid so the form refuses to submit.
-const BAD_DATE = 'That date does not exist (e.g. Feb 31). Pick a real date.';
-
-export function Input({ label, className = '', type, onChange, onBlur, onKeyUp, ...props }) {
-  const [dateErr, setDateErr] = useState('');
-  const checkDate = (el) => {
-    if (type !== 'date') return;
-    const msg = el.validity.badInput ? BAD_DATE : '';
-    el.setCustomValidity(msg);
-    setDateErr(msg);
-  };
+export function Input({ label, className = '', ...props }) {
   return (
     <label className="block">
       {label && <span className="block text-sm font-medium mb-1.5 text-ink-900">{label}</span>}
       <input
-        type={type}
-        aria-invalid={dateErr ? true : undefined}
-        className={`w-full px-4 py-2.5 rounded-full border ${dateErr ? 'border-red-500' : 'border-brand-100'} bg-white focus:outline-none focus:ring-2 focus:ring-green-primary/30 focus:border-green-primary transition-all ${className}`}
-        onChange={(e) => { checkDate(e.target); onChange?.(e); }}
-        onBlur={(e) => { checkDate(e.target); onBlur?.(e); }}
-        onKeyUp={(e) => { checkDate(e.target); onKeyUp?.(e); }}
+        className={`w-full px-4 py-2.5 rounded-full border border-brand-100 bg-white focus:outline-none focus:ring-2 focus:ring-green-primary/30 focus:border-green-primary transition-all ${className}`}
         {...props}
       />
-      {dateErr && <span role="alert" className="block text-xs text-red-600 mt-1 px-2">{dateErr}</span>}
     </label>
+  );
+}
+
+// Date picker: a calendar-icon pill instead of a typeable mm/dd/yyyy box. The visible
+// control is a button; the real <input type=date> sits invisibly over it and opens with
+// showPicker(), so nobody can hand-type an impossible date (Feb 31) into the app.
+export function DateField({ label, value, onChange, min, max, placeholder = 'Any date', className = '', disabled = false }) {
+  const ref = useRef(null);
+  const open = () => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof el.showPicker === 'function') {
+      try { el.showPicker(); return; } catch { /* fall back to focus */ }
+    }
+    el.focus();
+    el.click();
+  };
+  const clear = () => onChange?.({ target: { value: '' } });
+  return (
+    <div className={`block ${className}`}>
+      {label && <span className="block text-sm font-medium mb-1.5 text-ink-900">{label}</span>}
+      <span className="relative flex items-center">
+        <button
+          type="button"
+          onClick={open}
+          disabled={disabled}
+          aria-label={label || placeholder}
+          aria-haspopup="dialog"
+          className="w-full flex items-center gap-2 pl-4 pr-9 py-2.5 rounded-full border border-brand-100 bg-white text-sm text-left hover:border-green-primary/40 focus:outline-none focus:ring-2 focus:ring-green-primary/30 focus:border-green-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <CalendarDays className="w-4 h-4 text-green-primary shrink-0" />
+          <span className={`flex-1 truncate ${value ? 'text-ink-900' : 'text-mid-500'}`} title={value ? fmtDate(value) : undefined}>
+            {value ? fmtDate(value) : placeholder}
+          </span>
+        </button>
+        {value && !disabled && (
+          <button
+            type="button"
+            onClick={clear}
+            aria-label="Clear date"
+            className="absolute right-2 p-1 rounded-full text-mid-500 hover:bg-brand-100 hover:text-ink-900"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+        <input
+          ref={ref}
+          type="date"
+          tabIndex={-1}
+          aria-hidden="true"
+          value={value || ''}
+          min={min || undefined}
+          max={max || undefined}
+          onChange={onChange}
+          className="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+        />
+      </span>
+    </div>
   );
 }
 

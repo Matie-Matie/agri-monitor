@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Plus, Search, Pencil, Archive, ChevronRight, ChevronDown, PackagePlus, Barcode as BarcodeIcon, RotateCcw, X } from 'lucide-react';
 import api from '../api/client.js';
-import { Card, Button, Input, Modal, Badge, Spinner, EmptyState, peso, fmtDate } from '../components/ui.jsx';
+import { Card, Button, Input, DateField, Modal, Badge, Spinner, EmptyState, peso, fmtDate } from '../components/ui.jsx';
 import LabelModal from '../components/LabelModal.jsx';
 import { toast } from '../components/Toast.jsx';
 import { isAdmin } from '../store/auth.js';
@@ -318,8 +318,8 @@ export default function Products() {
               <p className="text-sm font-medium">First stock <span className="text-mid-500 font-normal">· batch number is generated automatically</span></p>
               <div className="grid grid-cols-2 gap-3">
                 <Input label="Quantity" type="number" min="0" value={form.initial_quantity} onChange={(e) => setForm({ ...form, initial_quantity: e.target.value })} placeholder="0" />
-                <Input label="Date received" type="date" max={today()} value={form.received_at} onChange={(e) => setForm({ ...form, received_at: e.target.value })} />
-                <div className="col-span-2"><Input label="Expiry date (optional)" type="date" min={form.received_at || undefined} value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} /></div>
+                <DateField label="Date received" max={today()} value={form.received_at} onChange={(e) => setForm({ ...form, received_at: e.target.value })} />
+                <div className="col-span-2"><DateField label="Expiry date (optional)" min={form.received_at || undefined} value={form.expiry_date} onChange={(e) => setForm({ ...form, expiry_date: e.target.value })} placeholder="No expiry" /></div>
               </div>
             </div>
           )}
@@ -343,7 +343,7 @@ export default function Products() {
             <p className="text-sm text-mid-500">A batch number is generated automatically when you save.</p>
             <div className="grid grid-cols-2 gap-3">
               <Input label={`Quantity (${stockModal.unit})`} type="number" min="1" value={stockForm.quantity} onChange={(e) => setStockForm({ ...stockForm, quantity: e.target.value })} required />
-              <Input label="Date received" type="date" max={today()} value={stockForm.received_at} onChange={(e) => setStockForm({ ...stockForm, received_at: e.target.value })} />
+              <DateField label="Date received" max={today()} value={stockForm.received_at} onChange={(e) => setStockForm({ ...stockForm, received_at: e.target.value })} />
             </div>
             <label className="block">
               <span className="block text-sm font-medium mb-1.5">Supplier</span>
@@ -353,7 +353,7 @@ export default function Products() {
                 {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
             </label>
-            <Input label="Expiry date (optional)" type="date" min={stockForm.received_at || undefined} value={stockForm.expiry_date} onChange={(e) => setStockForm({ ...stockForm, expiry_date: e.target.value })} />
+            <DateField label="Expiry date (optional)" min={stockForm.received_at || undefined} value={stockForm.expiry_date} onChange={(e) => setStockForm({ ...stockForm, expiry_date: e.target.value })} placeholder="No expiry" />
             <div className="flex gap-3 pt-2">
               <Button type="submit" className="flex-1">Add stock</Button>
               <Button type="button" variant="outline" onClick={() => setStockModal(null)}>Cancel</Button>

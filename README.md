@@ -60,6 +60,11 @@ Optional env: `LOW_STOCK_THRESHOLD` (default 10): one global low-stock rule for 
 | admin | admin123 | Admin — full access |
 | cashier | cashier123 | Staff — POS + view products |
 
+## Version 4 (2026-11-09)
+
+- **No more typing dates.** Every date field (Reports and Sales filters, Date received, Expiry date) is now a calendar-icon button that opens the browser date picker. The old `mm/dd/yyyy` text box is gone, so impossible dates (Feb 31) can no longer be typed at all.
+- Picked dates show in the pill (e.g. *Nov 9, 2026*); the small × clears the filter.
+
 ## Version 3 (2026-10-22)
 
 - **Footer with version** on every page and the login screen: *Version 3 · Revision 2 · Updated October 22, 2026*. Bump `frontend/src/version.js` on each revision.

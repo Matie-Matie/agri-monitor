@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
 import api, { API_BASE } from '../api/client.js';
-import { Card, Button, Input, Badge, Spinner, peso, fmtDate } from '../components/ui.jsx';
+import { Card, Button, DateField, Badge, Spinner, peso, fmtDate } from '../components/ui.jsx';
 
 const TABS = [
   { id: 'sales', label: 'Sales Report' },
@@ -51,9 +51,9 @@ export default function Reports() {
           <h1 className="text-2xl font-semibold">Reports</h1>
           <p className="text-mid-500">Business reports for monitoring and evaluation.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-40" />
-          <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-40" />
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <DateField value={from} onChange={(e) => setFrom(e.target.value)} max={to || undefined} placeholder="From" className="w-44" />
+          <DateField value={to} onChange={(e) => setTo(e.target.value)} min={from || undefined} placeholder="To" className="w-44" />
           <Button variant="outline" onClick={loadReport}>Apply</Button>
           <Button onClick={exportCSV}><Download className="w-4 h-4" /> Export CSV</Button>
         </div>

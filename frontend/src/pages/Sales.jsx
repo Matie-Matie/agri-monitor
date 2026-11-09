@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Eye, CalendarDays, BadgeCheck } from 'lucide-react';
 import api from '../api/client.js';
-import { Card, Button, Input, Modal, Spinner, Badge, peso, fmtDateTime } from '../components/ui.jsx';
+import { Card, Button, DateField, Modal, Spinner, Badge, peso, fmtDateTime } from '../components/ui.jsx';
 import { toast } from '../components/Toast.jsx';
 
 const localDate = (d = new Date()) =>
@@ -55,10 +55,10 @@ export default function Sales() {
 
       <Card className="p-5 mb-5 flex flex-wrap gap-3 items-end">
         <div className="w-44">
-          <Input label="From" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          <DateField label="From" value={from} onChange={(e) => setFrom(e.target.value)} max={to || undefined} />
         </div>
         <div className="w-44">
-          <Input label="To" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+          <DateField label="To" value={to} onChange={(e) => setTo(e.target.value)} min={from || undefined} />
         </div>
         <label className="block w-44">
           <span className="block text-sm font-medium mb-1.5">Payment</span>
