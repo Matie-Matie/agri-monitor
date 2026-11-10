@@ -60,9 +60,14 @@ Optional env: `LOW_STOCK_THRESHOLD` (default 10): one global low-stock rule for 
 | admin | admin123 | Admin — full access |
 | cashier | cashier123 | Staff — POS + view products |
 
+## Version 8 (2026-11-10)
+
+- **Reports stays on the cashier page.** Per Roan's group, cashiers keep Reports: the report API now accepts admin **and** staff, and the menu/route are open again for both roles (view + CSV export).
+- The endless-loading bug is still fixed: any report that fails shows a "Could not load this report" card with **Try again** instead of spinning forever.
+
 ## Version 7 (2026-11-10)
 
-- **Cashier Reports bug fixed.** Reports was visible to cashier accounts but the API only allows admin, so the page spun forever. Reports is now admin-only in the menu and route (cashier goes back to the dashboard), and any report that fails to load shows a "Could not load this report" card with **Try again** instead of an endless spinner.
+- Fixed the cashier Reports endless spinner (the API was admin-only). Superseded by Version 8, which opens Reports to cashier again as the panel asked.
 
 ## Version 6 (2026-11-09)
 

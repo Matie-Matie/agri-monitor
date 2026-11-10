@@ -36,7 +36,7 @@ export default function App() {
         <Route path="/inventory" element={<Navigate to="/products" replace />} />
         <Route path="/suppliers" element={<Protected adminOnly><Suppliers /></Protected>} />
         <Route path="/sales" element={<Sales />} />
-        <Route path="/reports" element={<Protected adminOnly><Reports /></Protected>} />
+        <Route path="/reports" element={<Reports />} />
         <Route path="/users" element={<Protected adminOnly><Users /></Protected>} />
         <Route path="/activity" element={<Protected adminOnly><Activity /></Protected>} />
       </Route>

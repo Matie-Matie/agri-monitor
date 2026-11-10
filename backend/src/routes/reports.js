@@ -6,7 +6,8 @@ import { rangeDateError } from '../utils/helpers.js';
 import { LOW_STOCK_THRESHOLD } from '../config/settings.js';
 
 const router = Router();
-router.use(authRequired, roleGuard('admin'));
+// Panel: cashiers keep their Reports page. Both roles can read and export.
+router.use(authRequired, roleGuard('admin', 'staff'));
 
 // ── Inventory report (per product) ──
 router.get('/inventory', asyncHandler(async (_req, res) => {
