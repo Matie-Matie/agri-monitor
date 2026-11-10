@@ -60,6 +60,10 @@ Optional env: `LOW_STOCK_THRESHOLD` (default 10): one global low-stock rule for 
 | admin | admin123 | Admin — full access |
 | cashier | cashier123 | Staff — POS + view products |
 
+## Version 7 (2026-11-10)
+
+- **Cashier Reports bug fixed.** Reports was visible to cashier accounts but the API only allows admin, so the page spun forever. Reports is now admin-only in the menu and route (cashier goes back to the dashboard), and any report that fails to load shows a "Could not load this report" card with **Try again** instead of an endless spinner.
+
 ## Version 6 (2026-11-09)
 
 - **One-click fullscreen start.** `start.bat` now finds XAMPP (C:\xampp, D:\xampp or E:\xampp), starts MySQL automatically and waits for it, then opens the system fullscreen in a Chrome/Edge app window once the server is listening. If the server is already running, the same shortcut just reopens the window.

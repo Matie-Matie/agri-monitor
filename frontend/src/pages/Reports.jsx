@@ -14,6 +14,7 @@ export default function Reports() {
   const [tab, setTab] = useState('sales');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
@@ -21,8 +22,12 @@ export default function Reports() {
 
   const loadReport = () => {
     setLoading(true);
+    setError('');
     const params = { from: from || undefined, to: to || undefined };
-    api.get(`/reports/${tab}`, { params }).then((r) => setData(r.data)).finally(() => setLoading(false));
+    api.get(`/reports/${tab}`, { params })
+      .then((r) => setData(r.data))
+      .catch((e) => setError(e.response?.data?.message || 'Could not load this report. Check the connection and try again.'))
+      .finally(() => setLoading(false));
   };
 
   const exportCSV = () => {
@@ -68,7 +73,13 @@ export default function Reports() {
         ))}
       </div>
 
-      {loading || !data ? <Spinner /> : <TabContent tab={tab} data={data} />}
+      {loading ? <Spinner /> : error ? (
+        <Card className="p-10 text-center">
+          <p className="font-semibold">Could not load this report</p>
+          <p className="text-sm text-mid-500 mt-1">{error}</p>
+          <Button className="mt-5" onClick={loadReport}>Try again</Button>
+        </Card>
+      ) : data ? <TabContent tab={tab} data={data} /> : null}
     </div>
   );
 }

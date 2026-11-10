@@ -13,7 +13,7 @@ const navItems = [
   { to: '/products', label: 'Products', icon: Package },
   { to: '/suppliers', label: 'Suppliers', icon: Truck, admin: true },
   { to: '/sales', label: 'Sales', icon: Receipt },
-  { to: '/reports', label: 'Reports', icon: BarChart3 },
+  { to: '/reports', label: 'Reports', icon: BarChart3, admin: true },
   { to: '/users', label: 'Users', icon: UsersIcon, admin: true },
   { to: '/activity', label: 'Activity Log', icon: ScrollText, admin: true },
 ];
